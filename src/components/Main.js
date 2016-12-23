@@ -53,8 +53,8 @@ handleClick(e){
 
     //如过图片的旋转角度有值且不为0，则使用 否则添加旋转角度
     if(this.props.arrange.rotate){
-      (['-moz-','-ms-','-webkit-','']).forEach(function(value){
-         styleObj[value+'transform']='rotate('+this.props.arrange.rotate+'deg)';
+      (['MozTransfrom','msTransfrom','WebkitTransfrom','transform']).forEach(function(value){
+         styleObj[value]='rotate('+this.props.arrange.rotate+'deg)';
       },this);
      
     }
@@ -80,6 +80,69 @@ handleClick(e){
     )
   }
 }
+
+class ControllerUnit extends React.Component{
+  constructor(props){
+    super(props)
+    this.handleClick=this.handleClick.bind(this)
+  }
+  handleClick(e){
+
+      //如果点击选中态按钮，则反转，否则居中
+      if(this.props.arrange.isCenter){
+        this.props.inverse();
+      }else{
+        this.props.center();
+      }
+      e.preventDefault();
+      e.stopPropagation();
+  }
+  render(){
+    let controllerUnitClassName="controller-unit";
+
+    //如果对应剧中图片，显示居中态
+    if(this.props.arrange.isCenter){
+      controllerUnitClassName+=" is-center";
+
+      //如果同时还是翻转态
+      if(this.props.arrange.isInverse)
+      controllerUnitClassName+=" is-inverse";
+    }
+    return(
+      <span className={controllerUnitClassName} onClick={this.handleClick} ></span>
+    );
+  }
+}
+// var ControllerUnit = React.createClass({
+// 	handleClick: function(e){
+
+// 		//如果点击的是当前选中态的按钮，则翻转图片，否则将对应的图片居中
+// 		if(this.props.arrange.isCenter){
+// 			this.props.inverse();
+// 		} else{
+// 			this.props.center();
+// 		}
+// 		e.preventDefault();
+// 		e.stopPropagation();
+// 	},
+// 	render: function(){
+// 		var controllerUnitClassName = 'controller-unit';
+
+// 		//如果对应的是居中的图片，显示控制按钮的居中态
+// 		if(this.props.arrange.isCenter){
+// 			controllerUnitClassName += ' is-center';
+
+// 			//如果同时对应的是反转图片，显示控制按钮的翻转态
+// 			if(this.props.arrange.isInverse){
+// 				controllerUnitClassName += ' is-inverse';
+// 			}
+// 		}
+// 		return(
+// 			<span className={controllerUnitClassName} onClick={this.handleClick}></span>
+// 		);
+// 	}
+// })
+
 class AppComponent extends React.Component {
   constructor(props){
     super(props)
@@ -125,7 +188,7 @@ center(index){
 inverse(index){
   //console.log(this);
   return function(){
-    console.log(this.state);
+  //  console.log(this.state);
   let imgsArrangeArr=this.state.imgsArrangeArr;
 
   imgsArrangeArr[index].isInverse=!imgsArrangeArr[index].isInverse;
@@ -154,7 +217,7 @@ vPosRangeTopY=vPosRange.topY,
 vPosRangeX=vPosRange.x,
 
 imgsArrangeTopArr=[],
-topImgNum=Math.ceil(Math.random()*2)
+topImgNum=Math.floor(Math.random()*2)
 //取一个或者不取
 let topImgSpliceIndex=0,
 
@@ -225,7 +288,7 @@ if(imgsArrangeTopArr&&imgsArrangeTopArr[0]) {
 }
 
 imgsArrangeArr.splice(centerIndex,0,imgsArrangeCenterArr[0]);
-console.log(imgsArrangeCenterArr[0].pos.left,imgsArrangeCenterArr[0].pos.top)
+//console.log(imgsArrangeCenterArr[0].pos.left,imgsArrangeCenterArr[0].pos.top)
 this.setState({
   imgsArrangeArr:imgsArrangeArr
 });
@@ -309,6 +372,10 @@ render() {
       }
       imgFigures.push(<ImgFigure data={value} key={index} ref={'imgFigure'+index}
       arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
+
+      controlers.push(<ControllerUnit key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
+      center={this.center(index)}/>)
+    
     },this);
 
    
@@ -320,6 +387,7 @@ render() {
       </section>
       <nav className="controller-nav">
       {controlers}
+    
       </nav>
 
       </section>
